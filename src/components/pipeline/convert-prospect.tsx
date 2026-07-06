@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { createClient as createSupabase } from "@/lib/supabase/client";
@@ -24,6 +24,9 @@ export function ConvertProspect({ prospect, open, onOpenChange }: ConvertProspec
   const router = useRouter();
   const [newClientId, setNewClientId] = useState<string | null>(null);
   const [policyOpen, setPolicyOpen] = useState(false);
+  // Ref, not state: ClientForm fires onSaved and the close event in the same
+  // tick, so a state flag wouldn't be visible to the close handler yet.
+  const createdClientId = useRef<string | null>(null);
 
   async function finishConversion() {
     const supabase = createSupabase();
@@ -41,13 +44,18 @@ export function ConvertProspect({ prospect, open, onOpenChange }: ConvertProspec
     <>
       <ClientForm
         open={open && !newClientId}
-        onOpenChange={onOpenChange}
+        onOpenChange={(o) => {
+          // A close caused by a successful save must not end the flow —
+          // the policy step still has to run. Only a cancel closes it.
+          if (!o && !createdClientId.current) onOpenChange(false);
+        }}
         defaults={{
           full_name: prospect.prospect_name,
           status: "active",
           client_source: "Referral",
         }}
         onSaved={(id) => {
+          createdClientId.current = id;
           setNewClientId(id);
           setPolicyOpen(true);
         }}

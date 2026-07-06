@@ -83,9 +83,11 @@ export function ClientForm({ open, onOpenChange, client, defaults, onSaved }: Cl
       setError(result.error.message);
       return;
     }
+    // onSaved first: multi-step flows (pipeline conversion) must learn the new
+    // id before the close event can unmount them.
+    onSaved?.(result.data.id);
     onOpenChange(false);
     router.refresh();
-    onSaved?.(result.data.id);
   }
 
   return (

@@ -96,11 +96,15 @@ alter table public.pipeline     enable row level security;
 alter table public.commissions  enable row level security;
 alter table public.settings     enable row level security;
 
+-- Idempotent: drop-then-create so the whole file can be re-run safely
+-- (create policy has no "if not exists" in Postgres).
 do $$
 declare t text;
 begin
   foreach t in array array['clients', 'policies', 'pipeline', 'commissions', 'settings']
   loop
+    execute format(
+      'drop policy if exists "authenticated full access" on public.%I', t);
     execute format(
       'create policy "authenticated full access" on public.%I
          for all to authenticated using (true) with check (true)', t);

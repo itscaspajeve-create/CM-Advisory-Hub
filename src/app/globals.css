@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 60 14% 98%;
+    --foreground: 0 0% 4%;
+    --card: 60 17% 99%;
+    --card-foreground: 0 0% 4%;
+    --popover: 60 17% 99%;
+    --popover-foreground: 0 0% 4%;
+    --primary: 0 84% 37%; /* PRU red */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 60 7% 94%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 60 7% 94%;
+    --muted-foreground: 40 3% 40%;
+    --accent: 60 7% 94%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 62% 52%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 45 12% 87%;
+    --input: 45 12% 87%;
+    --ring: 0 84% 37%;
+    --radius: 0.625rem;
+
+    /* Chart palette (validated categorical slots) */
+    --chart-1: #2a78d6;
+    --chart-2: #1baf7a;
+    --chart-3: #eda100;
+    --chart-4: #008300;
+    --chart-5: #4a3aa7;
+    --chart-6: #e34948;
+    --chart-7: #e87ba4;
+    --chart-8: #eb6834;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+/* Safe-area padding for phones with home-indicator / notch */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

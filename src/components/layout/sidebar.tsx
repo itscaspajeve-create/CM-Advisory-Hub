@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
+import Image from "next/image";
 
 import { NAV_ITEMS } from "@/components/layout/nav-items";
 import { createClient } from "@/lib/supabase/client";
@@ -22,9 +23,13 @@ export function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r bg-card md:flex">
       <div className="flex items-center gap-3 px-5 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">
-          P
-        </div>
+        <Image
+          src="/logo.png"
+          alt="Logo"
+          width={36}
+          height={36}
+          className="rounded-lg"
+        />
         <div>
           <p className="text-sm font-semibold leading-tight">PRU Dash</p>
           <p className="text-xs text-muted-foreground">Consultant workspace</p>

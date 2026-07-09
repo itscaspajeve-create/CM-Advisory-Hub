@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Camera } from "lucide-react";
+
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,12 +16,52 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+// The chosen picture is saved in this browser under this key, so it sticks
+// across refreshes on this device. Default falls back to the bundled logo.
+const LOGO_KEY = "login_logo";
+const DEFAULT_LOGO = "/logo.png";
+
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const [logoSrc, setLogoSrc] = useState(DEFAULT_LOGO);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  // Load any previously chosen picture once we're on the client.
+  useEffect(() => {
+    const saved = localStorage.getItem(LOGO_KEY);
+    if (saved) setLogoSrc(saved);
+  }, []);
+
+  function handlePickImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("Please choose an image file.");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setError("Image is too large — please pick one under 2 MB.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = String(reader.result);
+      setLogoSrc(dataUrl);
+      localStorage.setItem(LOGO_KEY, dataUrl);
+      setError(null);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function resetImage() {
+    localStorage.removeItem(LOGO_KEY);
+    setLogoSrc(DEFAULT_LOGO);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -37,20 +78,61 @@ export default function LoginPage() {
     router.refresh();
   }
 
+  const isCustom = logoSrc !== DEFAULT_LOGO;
+
   return (
     <main className="flex min-h-dvh items-center justify-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-primary">
-            <Image
-              src="/logo.png"
+          {/* Click the picture to change it */}
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            className="group relative mx-auto mb-2 flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-primary"
+            aria-label="Change login picture"
+            title="Click to change picture"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={logoSrc}
               alt="Logo"
-              width={56}
-              height={56}
               className="h-full w-full object-cover"
-              priority
             />
+            <span className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+              <Camera className="h-5 w-5 text-white" />
+            </span>
+          </button>
+
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handlePickImage}
+          />
+
+          <div className="mb-1 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              className="underline-offset-2 hover:underline"
+            >
+              Change picture
+            </button>
+            {isCustom && (
+              <>
+                <span aria-hidden>·</span>
+                <button
+                  type="button"
+                  onClick={resetImage}
+                  className="underline-offset-2 hover:underline"
+                >
+                  Reset
+                </button>
+              </>
+            )}
           </div>
+
           <CardTitle className="text-xl">PRU Consultant Dashboard</CardTitle>
           <CardDescription>Sign in to your workspace</CardDescription>
         </CardHeader>

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { MoreVertical, Pencil, Plus, Trash2 } from "lucide-react";
+import { Check, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
 import { COMMISSION_STATUSES, COMMISSION_TYPES } from "@/lib/constants";
@@ -114,6 +114,17 @@ export function CommissionsView({ commissions, policyOptions }: CommissionsViewP
     router.refresh();
   }
 
+  async function markReceived(c: CommissionWithPolicy) {
+    await createClient()
+      .from("commissions")
+      .update({
+        status: "received",
+        received_date: new Date().toISOString().slice(0, 10),
+      })
+      .eq("id", c.id);
+    router.refresh();
+  }
+
   function policyLabel(c: CommissionWithPolicy) {
     if (!c.policies) return "(deleted policy)";
     const client = c.policies.clients?.full_name;
@@ -124,14 +135,24 @@ export function CommissionsView({ commissions, policyOptions }: CommissionsViewP
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="Commission actions">
-            <MoreVertical className="h-4 w-4" />
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Commission actions"
+            className="text-base leading-none"
+          >
+            −
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={() => setEditing(c)}>
             <Pencil /> Edit
           </DropdownMenuItem>
+          {c.status !== "received" && (
+            <DropdownMenuItem onClick={() => markReceived(c)}>
+              <Check /> Mark received
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             className="text-destructive focus:text-destructive"
             onClick={() => setDeleting(c)}
@@ -279,10 +300,10 @@ export function CommissionsView({ commissions, policyOptions }: CommissionsViewP
                     <TableCell className="text-right font-medium tabular-nums">
                       {formatCurrency(c.amount)}
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
+                    <TableCell className="whitespace-nowrap text-muted-foreground">
                       {formatDate(c.expected_date)}
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
+                    <TableCell className="whitespace-nowrap text-muted-foreground">
                       {formatDate(c.received_date)}
                     </TableCell>
                     <TableCell>

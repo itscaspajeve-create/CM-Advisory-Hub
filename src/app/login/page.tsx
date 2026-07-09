@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import { Camera } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
+import {
+  DEFAULT_LOGO,
+  clearStoredLogo,
+  getStoredLogo,
+  setStoredLogo,
+} from "@/lib/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,11 +21,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-// The chosen picture is saved in this browser under this key, so it sticks
-// across refreshes on this device. Default falls back to the bundled logo.
-const LOGO_KEY = "login_logo";
-const DEFAULT_LOGO = "/logo.png";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -33,8 +34,7 @@ export default function LoginPage() {
 
   // Load any previously chosen picture once we're on the client.
   useEffect(() => {
-    const saved = localStorage.getItem(LOGO_KEY);
-    if (saved) setLogoSrc(saved);
+    setLogoSrc(getStoredLogo());
   }, []);
 
   function handlePickImage(e: React.ChangeEvent<HTMLInputElement>) {
@@ -52,14 +52,14 @@ export default function LoginPage() {
     reader.onload = () => {
       const dataUrl = String(reader.result);
       setLogoSrc(dataUrl);
-      localStorage.setItem(LOGO_KEY, dataUrl);
+      setStoredLogo(dataUrl);
       setError(null);
     };
     reader.readAsDataURL(file);
   }
 
   function resetImage() {
-    localStorage.removeItem(LOGO_KEY);
+    clearStoredLogo();
     setLogoSrc(DEFAULT_LOGO);
   }
 

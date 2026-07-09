@@ -1,18 +1,26 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
-import Image from "next/image";
 
 import { NAV_ITEMS } from "@/components/layout/nav-items";
 import { createClient } from "@/lib/supabase/client";
+import { DEFAULT_LOGO, getStoredLogo, onLogoChange } from "@/lib/logo";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+
+  // Show the picture chosen on the login screen (saved in this browser).
+  const [logoSrc, setLogoSrc] = useState(DEFAULT_LOGO);
+  useEffect(() => {
+    setLogoSrc(getStoredLogo());
+    return onLogoChange(() => setLogoSrc(getStoredLogo()));
+  }, []);
 
   async function signOut() {
     await createClient().auth.signOut();
@@ -23,12 +31,13 @@ export function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r bg-card md:flex">
       <div className="flex items-center gap-3 px-5 py-5">
-        <Image
-          src="/logo.png"
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={logoSrc}
           alt="Logo"
           width={36}
           height={36}
-          className="rounded-lg"
+          className="h-9 w-9 rounded-lg object-cover"
         />
         <div>
           <p className="text-sm font-semibold leading-tight">PRU Dash</p>

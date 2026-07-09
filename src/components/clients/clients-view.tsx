@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronRight, Phone, Plus, Search } from "lucide-react";
+import { ChevronRight, Mars, Phone, Plus, Search, Venus } from "lucide-react";
 
 import type { Client } from "@/lib/types";
 import { CLIENT_STATUSES } from "@/lib/constants";
@@ -30,6 +30,19 @@ import { ClientForm } from "@/components/clients/client-form";
 import { ClientStatusBadge } from "@/components/clients/status-badge";
 
 type ClientWithCount = Client & { policies: { count: number }[] };
+
+/** Small colored icon indicating the client's gender (male / female). */
+function GenderIcon({ gender }: { gender: Client["gender"] }) {
+  if (gender === "male")
+    return (
+      <Mars className="h-4 w-4 shrink-0 text-blue-500" aria-label="Male" />
+    );
+  if (gender === "female")
+    return (
+      <Venus className="h-4 w-4 shrink-0 text-pink-500" aria-label="Female" />
+    );
+  return null;
+}
 
 interface ClientsViewProps {
   clients: ClientWithCount[];
@@ -105,6 +118,7 @@ export function ClientsView({ clients }: ClientsViewProps) {
                     <CardContent className="flex items-center gap-3 p-4">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
+                          <GenderIcon gender={c.gender} />
                           <p className="truncate font-medium">{c.full_name}</p>
                           <ClientStatusBadge status={c.status} />
                         </div>
@@ -149,7 +163,12 @@ export function ClientsView({ clients }: ClientsViewProps) {
                     className="cursor-pointer"
                     onClick={() => router.push(`/clients/${c.id}`)}
                   >
-                    <TableCell className="font-medium">{c.full_name}</TableCell>
+                    <TableCell className="font-medium">
+                      <span className="flex items-center gap-2">
+                        <GenderIcon gender={c.gender} />
+                        {c.full_name}
+                      </span>
+                    </TableCell>
                     <TableCell className="text-muted-foreground">{c.phone ?? "—"}</TableCell>
                     <TableCell className="text-muted-foreground">{c.occupation ?? "—"}</TableCell>
                     <TableCell className="text-muted-foreground">{c.client_source ?? "—"}</TableCell>

@@ -55,6 +55,26 @@ interface PipelineViewProps {
   items: PipelineItem[];
 }
 
+/** Per-stage colors so each column/label reads at a glance. */
+const STAGE_STYLE: Record<PipelineStage, { dot: string; text: string }> = {
+  lead: { dot: "bg-gray-400", text: "text-gray-600" },
+  contacted: { dot: "bg-blue-500", text: "text-blue-600" },
+  presented: { dot: "bg-green-500", text: "text-green-600" },
+  proposal: { dot: "bg-yellow-500", text: "text-yellow-600" },
+  closing: { dot: "bg-red-500", text: "text-red-600" },
+  won: { dot: "bg-emerald-600", text: "text-emerald-700" },
+  lost: { dot: "bg-slate-400", text: "text-slate-500" },
+};
+
+function StageDot({ stage }: { stage: PipelineStage }) {
+  return (
+    <span
+      className={cn("h-2.5 w-2.5 shrink-0 rounded-full", STAGE_STYLE[stage].dot)}
+      aria-hidden
+    />
+  );
+}
+
 export function PipelineView({ items }: PipelineViewProps) {
   const router = useRouter();
   const [formOpen, setFormOpen] = useState(false);
@@ -214,7 +234,10 @@ export function PipelineView({ items }: PipelineViewProps) {
             <SelectItem value="all">All stages</SelectItem>
             {PIPELINE_STAGES.map((s) => (
               <SelectItem key={s.value} value={s.value}>
-                {s.label} ({byStage.get(s.value)?.length ?? 0})
+                <span className="flex items-center gap-2">
+                  <StageDot stage={s.value} />
+                  {s.label} ({byStage.get(s.value)?.length ?? 0})
+                </span>
               </SelectItem>
             ))}
           </SelectContent>
@@ -227,7 +250,13 @@ export function PipelineView({ items }: PipelineViewProps) {
             if (stageItems.length === 0 && mobileStageFilter === "all") return null;
             return (
               <section key={stage.value}>
-                <h2 className="mb-2 text-sm font-semibold text-muted-foreground">
+                <h2
+                  className={cn(
+                    "mb-2 flex items-center gap-2 text-sm font-semibold",
+                    STAGE_STYLE[stage.value].text
+                  )}
+                >
+                  <StageDot stage={stage.value} />
                   {stage.label} · {stageItems.length}
                 </h2>
                 <div className="space-y-2">
@@ -276,7 +305,15 @@ export function PipelineView({ items }: PipelineViewProps) {
               )}
             >
               <div className="mb-2 flex items-center justify-between px-1">
-                <h2 className="text-sm font-semibold">{stage.label}</h2>
+                <h2
+                  className={cn(
+                    "flex items-center gap-2 text-sm font-semibold",
+                    STAGE_STYLE[stage.value].text
+                  )}
+                >
+                  <StageDot stage={stage.value} />
+                  {stage.label}
+                </h2>
                 <span className="text-xs tabular-nums text-muted-foreground">
                   {stageItems.length} · {formatCurrency(stageApe, "PHP", true)}
                 </span>
@@ -297,7 +334,13 @@ export function PipelineView({ items }: PipelineViewProps) {
           const list = byStage.get(terminal) ?? [];
           return (
             <div key={terminal} className="rounded-xl border bg-muted/40 p-3">
-              <h2 className="mb-2 text-sm font-semibold capitalize">
+              <h2
+                className={cn(
+                  "mb-2 flex items-center gap-2 text-sm font-semibold capitalize",
+                  STAGE_STYLE[terminal].text
+                )}
+              >
+                <StageDot stage={terminal} />
                 {terminal} · {list.length}
               </h2>
               <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">

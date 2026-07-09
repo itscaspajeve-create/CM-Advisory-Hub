@@ -7,7 +7,7 @@
  * storage — see notes in the login page.
  */
 
-export const LOGO_KEY = "app_logo";
+const LOGO_KEY = "app_logo";
 export const DEFAULT_LOGO = "/logo.png";
 
 /** Custom event so same-tab listeners update immediately after a change. */

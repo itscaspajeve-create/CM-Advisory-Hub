@@ -5,6 +5,7 @@ import type {
   PipelineStage,
   PolicyStatus,
   PremiumMode,
+  ReminderStatus,
 } from "@/lib/types";
 
 /** Options shown in dropdowns. Add entries here to extend the app. */
@@ -89,6 +90,13 @@ export const COMMISSION_STATUSES: { value: CommissionStatus; label: string }[] =
   { value: "expected", label: "Expected" },
   { value: "received", label: "Received" },
   { value: "clawback", label: "Clawback" },
+];
+
+/** Reminder / outreach states for upcoming renewals. */
+export const REMINDER_STATUSES: { value: ReminderStatus; label: string }[] = [
+  { value: "to_contact", label: "To contact" },
+  { value: "contacting_done", label: "Done contacting" },
+  { value: "policy_review", label: "For policy review" },
 ];
 
 export const DEFAULT_MDRT_GOAL = 1_300_000; // PHP; editable on the Overview page

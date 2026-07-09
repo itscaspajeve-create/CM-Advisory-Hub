@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -40,8 +41,15 @@ export default function LoginPage() {
     <main className="flex min-h-dvh items-center justify-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-2xl font-bold text-primary-foreground">
-            P
+          <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-primary">
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              width={56}
+              height={56}
+              className="h-full w-full object-cover"
+              priority
+            />
           </div>
           <CardTitle className="text-xl">PRU Consultant Dashboard</CardTitle>
           <CardDescription>Sign in to your workspace</CardDescription>

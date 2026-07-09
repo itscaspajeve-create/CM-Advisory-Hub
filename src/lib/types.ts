@@ -24,6 +24,9 @@ export interface Client {
 export type PolicyStatus = "inforce" | "pending" | "lapsed" | "surrendered" | "claimed";
 export type PremiumMode = "annual" | "semi_annual" | "quarterly" | "monthly" | "single";
 
+/** Outreach state for an upcoming renewal, shown on the Renewals page. */
+export type ReminderStatus = "to_contact" | "contacting_done" | "policy_review";
+
 export interface Policy {
   id: string;
   client_id: string;
@@ -41,6 +44,7 @@ export interface Policy {
   riders: string | null;
   status: PolicyStatus;
   fund_allocation: string | null;
+  reminder_status: ReminderStatus | null;
   created_at: string;
 }
 

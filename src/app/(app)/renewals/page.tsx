@@ -14,6 +14,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { PolicyStatusBadge } from "@/components/clients/status-badge";
+import { ReminderStatusControl } from "@/components/renewals/reminder-status-control";
 
 export const metadata: Metadata = { title: "Renewals & Alerts" };
 export const dynamic = "force-dynamic";
@@ -161,6 +162,12 @@ function RenewalRow({
             <p className="text-sm text-muted-foreground">
               Premium {formatCurrency(policy.premium_amount, policy.currency)}
             </p>
+            <div className="mt-2">
+              <ReminderStatusControl
+                policyId={policy.id}
+                value={policy.reminder_status}
+              />
+            </div>
           </div>
           {client?.phone && (
             <a
